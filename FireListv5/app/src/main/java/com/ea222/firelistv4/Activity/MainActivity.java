@@ -1,7 +1,9 @@
 package com.ea222.firelistv4.Activity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -14,17 +16,54 @@ import android.view.*;
 import android.widget.*;
 import com.ea222.firelistv4.Adapter.MyViewHolder;
 import com.ea222.firelistv4.Model.ReminderPOJO;
+import com.ea222.firelistv4.Model.Upload;
 import com.ea222.firelistv4.R;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.*;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.webkit.MimeTypeMap;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
+
 
 import static com.ea222.firelistv4.Model.ReminderPOJO.OrderByType;
 
@@ -36,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
     private DatabaseReference mDatabase;
 
+    private DatabaseReference mDatabaseRef;
+
     //private FirebaseDatabase mRef;
 
     private FirebaseAuth mAuth;
@@ -46,17 +87,34 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<ReminderPOJO> POJOs;
 
+    private StorageReference mStorage;
+
     // to save sort settings on device
     SharedPreferences mpref;
     // to sort cardviews inside recyclerView
     LinearLayoutManager layoutManager;
+
+    private Button mButtonChooseImage;
+    private Button mButtonUpload;
+    private TextView mTextViewShowUploads;
+    private EditText mEditTextFileName;
+    private ImageView mImageView;
+    private ProgressBar mProgressBar;
+
+    private Uri mImageUri;
+
+    private static final int PICK_IMAGE_REQUEST = 1;
+
+    private StorageTask mUploadTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        toolbar=findViewById(R.id.home_toolbar);
+        //mSelectImage = findViewById(R.id.selectImage);
+
+        toolbar = findViewById(R.id.home_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("ReminderList");
 
@@ -71,21 +129,21 @@ public class MainActivity extends AppCompatActivity {
 
         //mpref = this.getSharedPreferences("Sorted Data", MODE_PRIVATE);
         mpref = getSharedPreferences("Sorted Data", MODE_PRIVATE);
-        String mSort = mpref.getString("Sort","ascending");
+        String mSort = mpref.getString("Sort", "ascending");
 
 //        layoutManager=new LinearLayoutManager(this);
 //
 //        layoutManager.setStackFromEnd(true);
 //        layoutManager.setReverseLayout(true);
 
-        if(mSort.equals("ascending")){
-            layoutManager=new LinearLayoutManager(this);
+        if (mSort.equals("ascending")) {
+            layoutManager = new LinearLayoutManager(this);
             // adds new cardview (Data objects) at the bottom
             layoutManager.setReverseLayout(false);
             layoutManager.setStackFromEnd(false);
         }
         //recyclerView
-        recyclerView=findViewById(R.id.recycler_home);
+        recyclerView = findViewById(R.id.recycler_home);
 
         recyclerView.setHasFixedSize(true);
 
@@ -94,21 +152,70 @@ public class MainActivity extends AppCompatActivity {
         //make layout as LinearLayout
         recyclerView.setLayoutManager(layoutManager);
 
+//        mButtonChooseImage = findViewById(R.id.button_choose_image);
+//        mButtonUpload = findViewById(R.id.button_upload);
+//        mTextViewShowUploads = findViewById(R.id.text_view_show_uploads);
+//        mEditTextFileName = findViewById(R.id.edit_text_file_name);
+//        mImageView = findViewById(R.id.image_view);
+//        mProgressBar = findViewById(R.id.progress_bar);
+//
+//        mButtonChooseImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                openFileChooser();
+//            }
+//        });
+//
+//        mButtonUpload.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+//
+//        mTextViewShowUploads.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+//    }
+//
+//    private void openFileChooser() {
+//        Intent intent = new Intent();
+//        intent.setType("image/*");
+//        intent.setAction(Intent.ACTION_GET_CONTENT);
+//        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+//    }
+//
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+//                && data != null && data.getData() != null) {
+//            mImageUri = data.getData();
+//
+//            Picasso.get().load(mImageUri).into(mImageView);
+//        }
+
+
 
         /*
 FIRE BASE START
  */
-        mAuth=FirebaseAuth.getInstance();
 
-        FirebaseUser mUser=mAuth.getCurrentUser();
-        String uId=mUser.getUid();
+        mAuth = FirebaseAuth.getInstance();
+
+        FirebaseUser mUser = mAuth.getCurrentUser();
+        String uId = mUser.getUid();
 
         //query firebasedatabase
         //    mRef = FirebaseDatabase.getInstance();
 
         //   mDatabase= FirebaseDatabase.getInstance().getReference().child("ReminderList").child(uId);
         // cannot just do fdb.gt().gr() --> FireListv4
-        mDatabase= FirebaseDatabase.getInstance().getReference().child(uId);
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(uId);
 
         mDatabase.keepSynced(true);
 
@@ -125,12 +232,60 @@ FIRE BASE START
         });
 
 
-        button_fab=findViewById(R.id.use_fab);
+
+        /*
+
+        firebase upload image
+         */
+
+        // Create a storage reference from firebase
+        //mStorage = FirebaseStorage.getInstance().getReference();
+        mStorage = FirebaseStorage.getInstance().getReference().child(uId);
+
+//        mSelectImage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(Intent.ACTION_PICK);
+//
+//                // we only want to select image(s)
+//                intent.setType("image/*");
+//
+//                startActivityForResult(intent, GALLERY_INTENT);
+//            }
+//        });
+//
+//    }
+
+        // method has callback on failed attempt
+//       @Override
+//        protected void onActivityResult(int requestCode, int resultCode, Intent data){
+//           super.onActivityResult(requestCode, resultCode, data);
+//
+//           if(requestCode == GALLERY_INTENT && resultCode == RESULT_OK){
+//
+//                Uri uri = data.getData();
+//
+//                StorageReference filepath = mStorage.child("photos").child(uri.getLastPathSegment());
+//
+//                filepath.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                    @Override
+//                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//
+//                        Toast.makeText(MainActivity.this, "Upload finished ", Toast.LENGTH_SHORT).show();
+//
+//                    }
+//                });
+//
+//           }
+
+
+        button_fab = findViewById(R.id.use_fab);
 
         button_fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 customDialog();
+
             }
         });
 
@@ -230,41 +385,79 @@ FIRE BASE START
 //        }
 
 
+    // opens add_reminder xml
+    private void customDialog() {
 
-    // opens add reminder xml
-    private void customDialog(){
+        AlertDialog.Builder mydialog = new AlertDialog.Builder(MainActivity.this);
 
-        AlertDialog.Builder mydialog=new AlertDialog.Builder(MainActivity.this);
+        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+        View myview = inflater.inflate(R.layout.add_reminder, null);
 
-        LayoutInflater inflater=LayoutInflater.from(MainActivity.this);
-        View myview=inflater.inflate(R.layout.add_reminder,null);
-
-        final AlertDialog dialog=mydialog.create();
+        final AlertDialog dialog = mydialog.create();
 
         dialog.setView(myview);
 
-        final EditText type=myview.findViewById(R.id.edt_type);
-        final EditText subtype=myview.findViewById(R.id.edt_subtype);
-        final EditText note=myview.findViewById(R.id.edt_note);
-        Button btnSave=myview.findViewById(R.id.btn_save);
+        //  final Button btnImage = myview.findViewById(R.id.selectImage);
+        //  mSelectImage = findViewById(R.id.selectImage);
+        final EditText type = myview.findViewById(R.id.edt_type);
+        final EditText subtype = myview.findViewById(R.id.edt_subtype);
+        final EditText note = myview.findViewById(R.id.edt_note);
+        Button btnSave = myview.findViewById(R.id.btn_save);
 
+        Button mButtonChooseImage = myview.findViewById(R.id.button_choose_image);
+        Button mButtonUpload = myview.findViewById(R.id.button_upload);
+        final TextView mTextViewShowUploads = myview.findViewById(R.id.text_view_show_uploads);
+        final EditText mEditTextFileName = myview.findViewById(R.id.edit_text_file_name);
+        final ImageView mImageView = myview.findViewById(R.id.image_view);
+        final ProgressBar mProgressBar = myview.findViewById(R.id.progress_bar);
+
+        mStorage = FirebaseStorage.getInstance().getReference("uploads");
+        // fix below it might break fbdb references from child uId
+        // mDatabaseRef
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference("uploads");
+
+
+        mButtonChooseImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openFileChooser();
+            }
+        });
+
+        mButtonUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mUploadTask != null && mUploadTask.isInProgress()) {
+                    Toast.makeText(MainActivity.this, "Upload in progress", Toast.LENGTH_SHORT).show();
+                } else {
+                    uploadFile();
+                }
+            }
+        });
+
+        mTextViewShowUploads.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openImagesActivity();
+            }
+        });
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                String mType=type.getText().toString().trim();
-                String mSubtype=subtype.getText().toString().trim();
-                String mNote=note.getText().toString().trim();
+                String mType = type.getText().toString().trim();
+                String mSubtype = subtype.getText().toString().trim();
+                String mNote = note.getText().toString().trim();
 
-                if (TextUtils.isEmpty(mType)){
+                if (TextUtils.isEmpty(mType)) {
                     type.setError("Cannot be blank");
                     return;
                 }
-                if (TextUtils.isEmpty(mSubtype)){
+                if (TextUtils.isEmpty(mSubtype)) {
                     subtype.setError("Cannot be blank");
                     return;
                 }
-                if (TextUtils.isEmpty(mNote)){
+                if (TextUtils.isEmpty(mNote)) {
                     note.setError("Cannot be blank");
                     return;
                 }
@@ -272,9 +465,9 @@ FIRE BASE START
                 //push() generates unique key for each child added chronologically
                 //getKey returns value of the unique timestamped key
                 //this id will be useful for read/write of listed data
-                String id=mDatabase.push().getKey();
+                String id = mDatabase.push().getKey();
 
-                String date= DateFormat.getDateInstance().format(new Date());
+                String date = DateFormat.getDateInstance().format(new Date());
                 ReminderPOJO data = new ReminderPOJO(date, id, mType, mSubtype, mNote);
 
                 //using setValue for initial values only
@@ -285,17 +478,94 @@ FIRE BASE START
 
                 //System.out.println("Printing item id? : " + mDatabase.child(id));
 
-                Toast.makeText(getApplicationContext(),"Reminder Added",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Reminder Added", Toast.LENGTH_SHORT).show();
 
                 dialog.dismiss();
             }
         });
 
-
         dialog.show();
 
     }
 
+    private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            mImageUri = data.getData();
+
+            Picasso.get().load(mImageUri).into(mImageView);
+        }
+
+    }
+
+
+    private String getFileExtension(Uri uri) {
+        ContentResolver cR = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cR.getType(uri));
+    }
+
+    private void uploadFile() {
+       // Task<Uri> firebaseUri;
+        if (mImageUri != null) {
+            StorageReference fileReference = mStorage.child(System.currentTimeMillis()
+                    + "." + getFileExtension(mImageUri));
+
+            mUploadTask = fileReference.putFile(mImageUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Handler handler = new Handler();
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mProgressBar.setProgress(0);
+                                }
+                            }, 500);
+
+                            Toast.makeText(MainActivity.this, "Upload successful", Toast.LENGTH_LONG).show();
+                            Upload upload = new Upload(mEditTextFileName.getText().toString().trim(),
+                                    taskSnapshot.getStorage().getDownloadUrl().toString());
+                                  //  taskSnapshot.getDownloadUrl().toString());
+                            //taskSnapshot.getStorage().getDownloadUrl();
+                            String uploadId = mDatabaseRef.push().getKey();
+                            mDatabaseRef.child(uploadId).setValue(upload);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                            mProgressBar.setProgress((int) progress);
+                        }
+                    });
+        } else {
+            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void openImagesActivity() {
+
+      //  Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, ImagesActivity.class);
+
+        startActivity(intent);
+    }
     // load all data into recycler view on application start
     @Override
     protected void onStart() {

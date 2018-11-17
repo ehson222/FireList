@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId  "com.ea222.firelistv4.Activity"
+        applicationId "com.ea222.firelistv4.Activity"
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
@@ -27,12 +27,14 @@ dependencies {
 
     implementation 'com.android.support:design:26.1.0'
 
-    implementation 'com.google.firebase:firebase-database:10.0.1'
+    implementation 'com.google.firebase:firebase-storage:16.0.4'
 
-    implementation 'com.google.firebase:firebase-auth:10.0.1'
+    implementation 'com.google.firebase:firebase-auth:16.0.5'
 
-    implementation 'com.google.firebase:firebase-core:10.0.1'
+    implementation 'com.google.firebase:firebase-core:16.0.4'
     implementation 'com.firebase:firebase-client-android:2.5.2'
+
+    implementation 'com.google.firebase:firebase-database:16.0.4'
 
     //4.2.1 0.4.0
     implementation 'com.firebaseui:firebase-ui-database:0.4.0'
@@ -42,6 +44,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
 
 }
 apply plugin: 'com.google.gms.google-services'
