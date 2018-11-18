@@ -152,53 +152,6 @@ public class MainActivity extends AppCompatActivity {
         //make layout as LinearLayout
         recyclerView.setLayoutManager(layoutManager);
 
-//        mButtonChooseImage = findViewById(R.id.button_choose_image);
-//        mButtonUpload = findViewById(R.id.button_upload);
-//        mTextViewShowUploads = findViewById(R.id.text_view_show_uploads);
-//        mEditTextFileName = findViewById(R.id.edit_text_file_name);
-//        mImageView = findViewById(R.id.image_view);
-//        mProgressBar = findViewById(R.id.progress_bar);
-//
-//        mButtonChooseImage.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                openFileChooser();
-//            }
-//        });
-//
-//        mButtonUpload.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-//
-//        mTextViewShowUploads.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
-//    }
-//
-//    private void openFileChooser() {
-//        Intent intent = new Intent();
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
-//        startActivityForResult(intent, PICK_IMAGE_REQUEST);
-//    }
-//
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
-//                && data != null && data.getData() != null) {
-//            mImageUri = data.getData();
-//
-//            Picasso.get().load(mImageUri).into(mImageView);
-//        }
-
 
 
         /*
@@ -566,6 +519,9 @@ FIRE BASE START
 
         startActivity(intent);
     }
+
+
+
     // load all data into recycler view on application start
     @Override
     protected void onStart() {

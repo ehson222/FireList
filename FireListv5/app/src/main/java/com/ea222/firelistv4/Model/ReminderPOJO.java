@@ -8,7 +8,6 @@ public class ReminderPOJO{
     String date, id, type, subtype, note;
     //must implement noArg constructor or will app will crash
     public ReminderPOJO(){
-
     }
 
     public ReminderPOJO(String date, String id, String type, String subtype, String note){

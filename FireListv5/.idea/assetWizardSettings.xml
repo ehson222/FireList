@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/Applications/IntelliJ%20IDEA%20CE.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/av/ic_sort_by_alpha_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/Applications/IntelliJ%20IDEA%20CE.app/Contents/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_save_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -33,7 +33,7 @@
                                   </option>
                                   <option name="values">
                                     <map>
-                                      <entry key="outputName" value="sort_icon" />
+                                      <entry key="outputName" value="btn_save" />
                                     </map>
                                   </option>
                                 </PersistentState>
