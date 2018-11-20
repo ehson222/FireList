@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.view.*;
 import android.widget.*;
 import com.ea222.firelistv4.Adapter.MyViewHolder;
+import com.ea222.firelistv4.Adapter.Prefs;
 import com.ea222.firelistv4.Model.ReminderPOJO;
 import com.ea222.firelistv4.Model.Upload;
 import com.ea222.firelistv4.R;
@@ -107,6 +108,9 @@ public class MainActivity extends AppCompatActivity {
 
     private StorageTask mUploadTask;
 
+    private AlertDialog.Builder alertDialogBuilder;
+    private AlertDialog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,6 +121,10 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.home_toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("ReminderList");
+
+        //search function
+        Prefs prefs = new Prefs(MainActivity.this);
+        String search = prefs.getSearch();
 
         //action bar
         // ActionBar actionBar = getSupportActionBar();
@@ -708,6 +716,14 @@ subclass it passing in all required parameters and implement the populateViewHol
 
 
         int id = item.getItemId();
+
+
+        if (id == R.id.new_search) {
+            showInputDialog();
+            // return true;
+        }
+
+
         if(id == R.id.sort_cardview){
             showSortDialog();
             Collections.sort(POJOs, OrderByType);
@@ -720,7 +736,41 @@ subclass it passing in all required parameters and implement the populateViewHol
             return true;
         }
 
+
+
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showInputDialog() {
+
+        alertDialogBuilder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_view, null);
+        final EditText newSearchEdt = (EditText) view.findViewById(R.id.searchEdt);
+        Button submitButton = (Button) view.findViewById(R.id.submitButton);
+
+        alertDialogBuilder.setView(view);
+        dialog = alertDialogBuilder.create();
+        dialog.show();
+
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Prefs prefs = new Prefs(MainActivity.this);
+
+                if (!newSearchEdt.getText().toString().isEmpty()) {
+
+                    String search = newSearchEdt.getText().toString();
+                    prefs.setSearch(search);
+
+                }
+                dialog.dismiss();
+
+
+            }
+        });
+
+
+
     }
 
     private void showSortDialog() {
@@ -748,4 +798,6 @@ subclass it passing in all required parameters and implement the populateViewHol
         builder.show();
         //builder.create().show();
     }
+
+
 }

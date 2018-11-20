@@ -14,6 +14,12 @@
             android:theme="@style/AppTheme">
         <activity android:name=".Activity.LoginActivity">
             <intent-filter>
+
+                //voice, searching text
+                <action android:name="com.google.android.gms.actions.SEARCH_ACTION"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.VOICE"/>
+
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
