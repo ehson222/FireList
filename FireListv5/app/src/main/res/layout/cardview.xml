@@ -10,9 +10,9 @@
     <LinearLayout
             android:layout_width="match_parent"
             android:orientation="horizontal"
-            android:padding="10dp"
+            android:padding="13dp"
             android:background="#f4d153"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
 
         <RelativeLayout
@@ -24,7 +24,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Type"
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearanceSmall"
                     android:id="@+id/type"
                     android:maxLines="1"
                     android:textColor="@android:color/black"
@@ -43,14 +43,14 @@
             />
             <CheckBox
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="42dp"
                     android:text=""
                     android:maxLines="1"
                     android:textAppearance="?android:textAppearanceSmall"
                     android:id="@+id/checkBox"
                     android:textColor="@android:color/black"
                     android:layout_weight="1.65" android:layout_alignParentStart="true"
-                    android:layout_alignParentBottom="true"/>
+                    android:layout_alignParentBottom="true" android:layout_marginBottom="0dp"/>
 
 
         </RelativeLayout>
