@@ -1,3 +1,1 @@
 # FireList
-
-![](FireList.gif)
