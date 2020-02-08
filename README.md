@@ -4,7 +4,7 @@ Welcome to my version of a Reminder List, based on Reminders (iphone) and Sticky
 
 <p align="left">
     <img src="FireList.gif" alt="Image" width="360" height="470" />
-    <img src="pic1.png" alt="Image" width="600" height="550" />
+    <img src="pic1.png" alt="Image" width="500" height="500" />
 </p>
 
 # Design Document
